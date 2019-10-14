@@ -2,7 +2,7 @@
 # DuplicateEntryOption needs to be defined before WeightedBinaryTree in order to use it in the method parameters
 # InsertionResult can be defined after WeightedBinaryTree if it is not used in the parameters.
 class DuplicateEntryOption:
-    ADD = "Add"
+    UPDATE = "Update"
     REPLACE = "Replace"
     IGNORE = "Ignore"
 
@@ -40,7 +40,7 @@ class WeightedBinaryTree(object):
     def insert(self, key, weight=DEFAULT_WEIGHT):
         self.simple_binary_insert(key, weight)
 
-    def simple_binary_insert(self, key, new_weight=DEFAULT_WEIGHT, duplicate_entry_option=DuplicateEntryOption.ADD):
+    def simple_binary_insert(self, key, new_weight=DEFAULT_WEIGHT, duplicate_entry_option=DuplicateEntryOption.UPDATE):
         if key is None:
             result = InsertionResult(None)
             result.status = InsertionResultStatus.FAILED
@@ -55,10 +55,10 @@ class WeightedBinaryTree(object):
                 result.previous_weight = self.weight
                 self.weight = new_weight
                 result.status = InsertionResultStatus.REPLACED
-            elif duplicate_entry_option == DuplicateEntryOption.ADD:
+            elif duplicate_entry_option == DuplicateEntryOption.UPDATE:
                 result.previous_weight = self.weight
                 self.weight += new_weight
-                result.status = InsertionResultStatus.REPLACED
+                result.status = InsertionResultStatus.UPDATED
             else:
                 # Default behavior will be the same as ignore
                 # TODO: specify a default as a constant or a class or object variable, not buried in the code here!

@@ -17,13 +17,13 @@ class TestCreateTree(unittest.TestCase):
         wbt = WeightedBinaryTree('root')
         wbt.left = WeightedBinaryTree('left', 2)
         wbt.right = WeightedBinaryTree('z')
-        #wbt.display()
+        # wbt.display()
 
 
 class BasicInsertionTestNoDuplication(unittest.TestCase):
 
     def test_simple_binary_insert_puts_items_in_the_correct_spot(self):
-        #With simple_binary_insert, k will remain the root
+        # With simple_binary_insert, k will remain the root
         root = WeightedBinaryTree('k')
         root.simple_binary_insert('c')
         root.simple_binary_insert('w')
@@ -149,11 +149,61 @@ class BasicInsertionTestWithIgnore(unittest.TestCase):
         self.assertEqual('w', result.inserted_node.key)
         self.assertEqual('Ignored', result.status)
 
+
+class TestInsertionWithAdd(unittest.TestCase):
+
+    def test_simple_binary_insert_updates_items_that_should_be_updated(self):
+        # With simple_binary_insert, k will remain the root
+        root = WeightedBinaryTree('k')
+        root.simple_binary_insert('c', 1.0, DuplicateEntryOption.UPDATE)
+        root.simple_binary_insert('w', 1.0, DuplicateEntryOption.UPDATE)
+        root.simple_binary_insert('m', 1.0, DuplicateEntryOption.UPDATE)
+        root.simple_binary_insert('x', 1.0, DuplicateEntryOption.UPDATE)
+        root.simple_binary_insert('a', 1.0, DuplicateEntryOption.UPDATE)
+        root.simple_binary_insert('e', 1.0, DuplicateEntryOption.UPDATE)
+
+        root.simple_binary_insert('c', 3.0, DuplicateEntryOption.UPDATE)
+        root.simple_binary_insert('w', 3.0, DuplicateEntryOption.UPDATE)
+        root.simple_binary_insert('m', 47.0, DuplicateEntryOption.UPDATE)
+
+        self.assertEqual('c', root.left.key)
+        self.assertEqual(4.0, root.left.weight)
+        self.assertEqual('w', root.right.key)
+        self.assertEqual(4.0, root.right.weight)
+        self.assertEqual('m', root.right.left.key)
+        self.assertEqual(48.0, root.right.left.weight)
+
+    def test_simple_binary_insert_returns_correct_insert_result(self):
+        root = WeightedBinaryTree('k')
+        result = root.simple_binary_insert('c', 1.0, DuplicateEntryOption.UPDATE)
+        self.assertTrue(isinstance(result, InsertionResult))
+        self.assertEqual('c', result.inserted_node.key)
+        self.assertEqual(InsertionResultStatus.CREATED, result.status)
+
+        result = root.simple_binary_insert('w', 1.0, DuplicateEntryOption.UPDATE)
+        self.assertTrue(isinstance(result, InsertionResult))
+        self.assertEqual('w', result.inserted_node.key)
+        self.assertEqual(InsertionResultStatus.CREATED, result.status)
+
+        # from attempts to add
+        result = root.simple_binary_insert('c', 3.0, DuplicateEntryOption.UPDATE)
+        self.assertTrue(isinstance(result, InsertionResult))
+        self.assertEqual('c', result.inserted_node.key)
+        self.assertEqual('Updated', result.status)
+
+        result = root.simple_binary_insert('w', 3.0, DuplicateEntryOption.UPDATE)
+        self.assertTrue(isinstance(result, InsertionResult))
+        self.assertEqual('w', result.inserted_node.key)
+        self.assertEqual('Updated', result.status)
+
+
+
 class TestHandleSubTrees(unittest.TestCase):
 
     def test_update_sub_tree_weight(self):
         root = WeightedBinaryTree('k', 2.0)
-        #simple_binary_insert() calls update_sub_tree_weights, so add the nods manually
+
+        # Simple_binary_insert() calls update_sub_tree_weights, so add the nods manually.
         root.left = WeightedBinaryTree('c', 3.0)
         self.assertEqual(0.0, root.sub_tree_weight)
         root.update_sub_tree_weights()
