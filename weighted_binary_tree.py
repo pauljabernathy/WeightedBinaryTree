@@ -40,6 +40,7 @@ class WeightedBinaryTree(object):
     def insert(self, key, weight=DEFAULT_WEIGHT):
         self.simple_binary_insert(key, weight)
 
+    # TODO: deal with with negative numbers (should not be allowed)
     def simple_binary_insert(self, key, new_weight=DEFAULT_WEIGHT, duplicate_entry_option=DuplicateEntryOption.UPDATE):
         if key is None:
             result = InsertionResult(None)
