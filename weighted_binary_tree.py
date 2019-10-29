@@ -11,12 +11,15 @@ class WeightedBinaryTree(object):
 
     DEFAULT_WEIGHT = 1.0
 
-    def __init__(self, key, weight = DEFAULT_WEIGHT):
+    def __init__(self, key, weight = DEFAULT_WEIGHT, parent=None, left=None, right=None):
         self.left = None #WeightedBinaryTree()
         self.right = None #WeightedBinaryTree()
         self.key = key
         self.weight = weight
         self.sub_tree_weight = 0.0
+        self.parent = parent
+        self.left = left
+        self.right = right
 
     def __str__(self):
         return f'{self.key} {self.weight} {self.sub_tree_weight} {self.get_tree_weight()}'
@@ -69,14 +72,14 @@ class WeightedBinaryTree(object):
             if self.left is not None:
                 result = self.left.simple_binary_insert(key, new_weight, duplicate_entry_option)
             else:
-                self.left = WeightedBinaryTree(key, new_weight)
+                self.left = WeightedBinaryTree(key, new_weight, parent=self)
                 result.inserted_node = self.left
                 result.status = InsertionResultStatus.CREATED
         elif key > self.key:
             if self.right is not None:
                 result = self.right.simple_binary_insert(key, new_weight, duplicate_entry_option)
             else:
-                self.right = WeightedBinaryTree(key, new_weight)
+                self.right = WeightedBinaryTree(key, new_weight, parent=self)
                 result.inserted_node = self.right
                 result.status = InsertionResultStatus.CREATED
         self.update_sub_tree_weights()
@@ -86,6 +89,25 @@ class WeightedBinaryTree(object):
         self.sub_tree_weight = self.left.get_tree_weight() if self.left is not None else 0.0
         self.sub_tree_weight += self.right.get_tree_weight() if self.right is not None else 0.0
         return self
+
+    def is_root(self):
+        return self.parent is None
+
+    def is_left_child(self):
+        if self.parent is None:
+            return False
+        if self.parent.left is not None and self.parent.left is self:
+            return True
+        else:
+            return False
+
+    def is_right_child(self):
+        if self.parent is None:
+            return False
+        if self.parent.right is not None and self.parent.right is self:
+            return True
+        else:
+            return False
 
 
 class InsertionResult:
