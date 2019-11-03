@@ -414,8 +414,30 @@ class TestPlaceInTree(unittest.TestCase):
         self.assertTrue(n.is_right_child())
 
 
-
 class TestRebalanceOneLevel(unittest.TestCase):
+
+    def test_when_self_is_root(self):
+        m = WeightedBinaryTree('m', 1)
+        j = m.simple_binary_insert('j', 10).inserted_node
+        l = m.simple_binary_insert('l', 1).inserted_node
+        i = m.simple_binary_insert('i', 1).inserted_node
+        n = m.simple_binary_insert('n', 1).inserted_node
+
+        self.assertTrue(m.is_root())
+        self.assertFalse(j.is_root())
+        self.assertFalse(n.is_root())
+        self.assertEqual(j, m.left)
+        self.assertEqual(n, m.right)
+
+        #should not through an error in the following line
+        m.rebalance_one_level()
+
+        #Now, the tree should be...exactly the same as before.
+        self.assertTrue(m.is_root())
+        self.assertFalse(j.is_root())
+        self.assertFalse(n.is_root())
+        self.assertEqual(j, m.left)
+        self.assertEqual(n, m.right)
 
     def test_when_parent_is_root_and_self_is_left(self):
         m = WeightedBinaryTree('m', 1)
@@ -423,5 +445,73 @@ class TestRebalanceOneLevel(unittest.TestCase):
         l = m.simple_binary_insert('l', 1).inserted_node
         i = m.simple_binary_insert('i', 1).inserted_node
         n = m.simple_binary_insert('n', 1).inserted_node
-
         m.display()
+
+        self.assertTrue(m.is_root())
+        self.assertFalse(j.is_root())
+
+        j.rebalance_one_level()
+        print()
+        j.display()
+        self.assertTrue(j.is_root())
+        self.assertFalse(m.is_root())
+        self.assertIsNone(j.parent)
+        self.assertEqual(i, j.left)
+        self.assertEqual(m, j.right)
+        self.assertEqual(l, m.left)
+        self.assertEqual(n, m.right)
+
+    def test_when_parent_is_root_and_this_is_right(self):
+        m = WeightedBinaryTree('m', 1)
+        l = m.simple_binary_insert('l').inserted_node
+        o = m.simple_binary_insert('o', 10).inserted_node
+        n = m.simple_binary_insert('n', 1).inserted_node
+        p = m.simple_binary_insert('p', 1).inserted_node
+        m.display()
+        print()
+
+        self.assertTrue(m.is_root())
+        self.assertFalse(o.is_root())
+        self.assertEqual(l, m.left)
+        self.assertEqual(o, m.right)
+        self.assertEqual(n, m.right.left)
+        self.assertEqual(p, m.right.right)
+
+        o.rebalance_one_level()
+        self.assertFalse(m.is_root())
+        self.assertTrue(o.is_root())
+        print()
+        o.display()
+        self.assertEqual(m, o.left)
+        self.assertEqual(l, m.left)
+        self.assertEqual(p, o.right)
+        self.assertEqual(n, m.right)
+
+    def test_when_parent_is_left_and_self_is_left(self):
+        m = WeightedBinaryTree('m', 1)
+        n = m.simple_binary_insert('n', 1).inserted_node
+        k = m.simple_binary_insert('k', 1).inserted_node
+        i = m.simple_binary_insert('i', 10).inserted_node
+        h = m.simple_binary_insert('h', 1).inserted_node
+        j = m.simple_binary_insert('j', 1).inserted_node
+        l = m.simple_binary_insert('l', 1).inserted_node
+        m.display()
+
+        self.assertTrue(m.is_root())
+        self.assertEqual(k, m.left)
+        self.assertEqual(n, m.right)
+        self.assertEqual(i, m.left.left)
+        self.assertEqual(h, m.left.left.left)
+        self.assertEqual(j, m.left.left.right)
+        self.assertEqual(l, m.left.right)
+
+        i.rebalance_one_level()
+        print()
+        m.display()
+        self.assertTrue(m.is_root())
+        self.assertEqual(i, m.left)
+        self.assertEqual(h, m.left.left)
+        self.assertEqual(k, m.left.right)
+        self.assertEqual(j, m.left.right.left)
+        self.assertEqual(l, m.left.right.right)
+        self.assertEqual(n, m.right)

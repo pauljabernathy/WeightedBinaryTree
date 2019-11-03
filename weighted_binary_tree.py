@@ -109,6 +109,47 @@ class WeightedBinaryTree(object):
         else:
             return False
 
+    #TODO: return a RebalanceResult
+    def rebalance_one_level(self):
+        """
+        Moves the current node up or down, and shifts parent, left and right, and parent's left or right, accordingly.
+        Does not rebalance the entire tree.
+        :return: nothing at the moment; will return a RebalanceResult when that is implemented.
+        """
+        if self.is_root():
+            return
+
+        old_parent = self.parent
+
+        if self.parent.is_root() and self.is_left_child():
+            old_right = self.right
+            self.right = old_parent
+            old_parent.parent = self
+            self.parent = None  #TODO: set_parent() method like in Java version if needed
+            old_parent.left = old_right
+            if old_right is not None:
+                old_right.parent = old_parent
+
+        elif self.parent.is_root() and self.is_right_child():
+            old_left = self.left
+            self.left = old_parent
+            old_parent.parent = self
+            self.parent = None
+            old_parent.right = old_left
+            if old_left is not None:
+                old_left.parent = old_parent
+
+        elif self.parent.is_left_child() and self.is_left_child():
+            old_right = self.right
+            old_grand_parent = old_parent.parent
+            self.right = old_parent
+            old_parent.parent = self
+            old_grand_parent.left = self
+            self.parent = old_grand_parent
+            old_parent.left = old_right
+            if old_right is not None:
+                old_right.parent = old_parent
+
 
 class InsertionResult:
     def __init__(self, inserted_node:WeightedBinaryTree=None):
