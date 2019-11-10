@@ -22,7 +22,7 @@ class WeightedBinaryTree(object):
         self.right = right
 
     def __str__(self):
-        return f'{self.key} {self.weight} {self.sub_tree_weight} {self.get_tree_weight()}'
+        return f'[{self.key} {self.weight} {self.sub_tree_weight} {self.get_tree_weight()}]'
 
     def display(self, prefix=None):
         if prefix is None:
@@ -149,6 +149,39 @@ class WeightedBinaryTree(object):
             old_parent.left = old_right
             if old_right is not None:
                 old_right.parent = old_parent
+
+        elif self.parent.is_left_child() and self.is_right_child():
+            old_left = self.left
+            old_grand_parent = old_parent.parent
+            self.left = old_parent
+            old_parent.parent = self
+            old_grand_parent.left = self
+            self.parent = old_grand_parent
+            old_parent.right = old_left
+            if old_left is not None:
+                old_left.parent = old_parent
+
+        elif self.parent.is_right_child() and self.is_left_child():
+            old_right = self.right
+            old_grand_parent = old_parent.parent
+            self.right = old_parent
+            old_parent.parent = self
+            old_grand_parent.right = self
+            self.parent = old_grand_parent
+            old_parent.left = old_right
+            if old_right is not None:
+                old_right.parent = old_parent
+
+        elif self.parent.is_right_child() and self.is_right_child():
+            old_left = self.left
+            old_grand_parent = old_parent.parent
+            self.left = old_parent
+            old_parent.parent = self
+            old_grand_parent.right = self
+            self.parent = old_grand_parent
+            old_parent.right = old_left
+            if old_left is not None:
+                old_left.parent = old_parent
 
 
 class InsertionResult:
