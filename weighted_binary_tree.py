@@ -40,6 +40,13 @@ class WeightedBinaryTree(object):
     def get_tree_weight(self):
         return self.weight + self.sub_tree_weight
 
+    def get_weights_list(self):
+        """
+        created to help in unit testing
+        :return: a list of weights in the form [self.weight, sub tree weight, total tree weight (self.weight + sub tree weight)]
+        """
+        return [self.weight, self.sub_tree_weight, self.get_tree_weight()]
+
     def insert(self, key, weight=DEFAULT_WEIGHT):
         self.simple_binary_insert(key, weight)
 
@@ -109,7 +116,7 @@ class WeightedBinaryTree(object):
         else:
             return False
 
-    #TODO: return a RebalanceResult
+    # TODO: return a RebalanceResult
     def rebalance_one_level(self):
         """
         Moves the current node up or down, and shifts parent, left and right, and parent's left or right, accordingly.
@@ -182,6 +189,11 @@ class WeightedBinaryTree(object):
             old_parent.right = old_left
             if old_left is not None:
                 old_left.parent = old_parent
+
+        old_parent.update_sub_tree_weights()
+        self.update_sub_tree_weights()
+        if self.parent is not None:
+            self.parent.update_sub_tree_weights()
 
 
 class InsertionResult:
