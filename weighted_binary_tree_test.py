@@ -45,7 +45,32 @@ class TestCreateTree(unittest.TestCase):
         # m.display()
 
 
-class BasicInsertionTestUpdate(unittest.TestCase):
+class TestInsert(unittest.TestCase):
+
+    def test_insert_new_can_become_root(self):
+        m = WeightedBinaryTree('m', 5)
+        j = m.simple_binary_insert('j', 4).inserted_node
+        l = m.simple_binary_insert('l', 1).inserted_node
+        n = m.simple_binary_insert('n', 6).inserted_node
+        self.assertTrue(m.is_root())
+        i = m.insert('i', 27).inserted_node
+        self.assertTrue(i.is_root())
+
+    def test_insert_with_update(self):
+        m = WeightedBinaryTree('m', 5)
+        j = m.simple_binary_insert('j', 4).inserted_node
+        l = m.simple_binary_insert('l', 1).inserted_node
+        i = m.simple_binary_insert('i', 1).inserted_node
+        n = m.simple_binary_insert('n', 6).inserted_node
+        self.assertTrue(m.is_root())
+        self.assertFalse(i.is_root())
+
+        m.insert('i', 27)
+        self.assertFalse(m.is_root())
+        self.assertTrue(i.is_root())
+
+
+class TestSimpleBinaryInsertBasics(unittest.TestCase):
 
     def test_simple_binary_insert_puts_items_in_the_correct_spot(self):
         # With simple_binary_insert, k will remain the root
@@ -437,6 +462,56 @@ class TestPlaceInTree(unittest.TestCase):
         self.assertFalse(i.is_right_child())
         self.assertFalse(n.is_left_child())
         self.assertTrue(n.is_right_child())
+
+
+class TestRebalance(unittest.TestCase):
+
+    def test_get_rebalance_threshold_weight(self):
+        m = WeightedBinaryTree('m', 5)
+        j = m.simple_binary_insert('j', 7).inserted_node
+        l = m.simple_binary_insert('l', 1).inserted_node
+        i = m.simple_binary_insert('i', 1).inserted_node
+        n = m.simple_binary_insert('n', 5).inserted_node
+        self.assertEqual(5, j.get_rebalance_threshold_weight())
+        self.assertEqual(5, n.get_rebalance_threshold_weight())
+
+    def test_should_rebalance(self):
+        m = WeightedBinaryTree('m', 5)
+        j = m.simple_binary_insert('j', 4).inserted_node
+        l = m.simple_binary_insert('l', 1).inserted_node
+        i = m.simple_binary_insert('i', 1).inserted_node
+        n = m.simple_binary_insert('n', 6).inserted_node
+        self.assertFalse(j.should_rebalance())
+        self.assertTrue(n.should_rebalance())
+
+    def test_rebalance_root_causes_no_changes(self):
+        """
+        Currently, the way rebalance works is it only moves up the node being rebalanced.  So a node of greater
+        weight below the node on which rebalance is called would not be moved.
+        """
+        m = WeightedBinaryTree('m', 5)
+        j = m.simple_binary_insert('j', 4).inserted_node
+        l = m.simple_binary_insert('l', 1).inserted_node
+        i = m.simple_binary_insert('i', 1).inserted_node
+        n = m.simple_binary_insert('n', 60).inserted_node
+        self.assertTrue(m.is_root())
+        m.rebalance()
+        self.assertTrue(m.is_root())
+
+    def test_rebalance_node_near_the_bottom(self):
+        m = WeightedBinaryTree('m', 5)
+        j = m.simple_binary_insert('j', 4).inserted_node
+        l = m.simple_binary_insert('l', 1).inserted_node
+        i = m.simple_binary_insert('i', 10).inserted_node
+        n = m.simple_binary_insert('n', 6).inserted_node
+
+        i.rebalance()
+        self.assertTrue(i.is_root())
+        self.assertFalse(m.is_root())
+        self.assertEqual(m, i.right)
+        self.assertEqual(j, m.left)
+        self.assertEqual(l, j.right)
+        self.assertEqual(n, m.right)
 
 
 class TestRebalanceOneLevel(unittest.TestCase):

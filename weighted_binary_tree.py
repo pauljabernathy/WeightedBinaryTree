@@ -10,6 +10,8 @@ class DuplicateEntryOption:
 class WeightedBinaryTree(object):
 
     DEFAULT_WEIGHT = 1.0
+    DEFAULT_DUPLICATE_ENTRY_OPTION = DuplicateEntryOption.UPDATE
+    REBALACE_COEFFICIENT = 1.0
 
     def __init__(self, key, weight = DEFAULT_WEIGHT, parent=None, left=None, right=None):
         self.left = None #WeightedBinaryTree()
@@ -47,11 +49,21 @@ class WeightedBinaryTree(object):
         """
         return [self.weight, self.sub_tree_weight, self.get_tree_weight()]
 
-    def insert(self, key, weight=DEFAULT_WEIGHT):
-        self.simple_binary_insert(key, weight)
+    def insert(self, key, weight=DEFAULT_WEIGHT, duplicate_entry_option=DEFAULT_DUPLICATE_ENTRY_OPTION):
+        """
+        inserts the given key, or updates the node in the tree if one is found with the given key
+        :param key: the item being inserted
+        :param weight: the weight the key will have
+        :param duplicate_entry_option: the DuplicateEntryOption to specify how to handle keys that already exist in the tree
+        :return: an InsertionResult representing what was inserted
+        """
+        insertion_result = self.simple_binary_insert(key, weight, duplicate_entry_option)
+        inserted_node = insertion_result.inserted_node
+        inserted_node.rebalance()
+        return insertion_result
 
     # TODO: deal with with negative numbers (should not be allowed)
-    def simple_binary_insert(self, key, new_weight=DEFAULT_WEIGHT, duplicate_entry_option=DuplicateEntryOption.UPDATE):
+    def simple_binary_insert(self, key, new_weight=DEFAULT_WEIGHT, duplicate_entry_option=DEFAULT_DUPLICATE_ENTRY_OPTION):
         if key is None:
             result = InsertionResult(None)
             result.status = InsertionResultStatus.FAILED
@@ -116,7 +128,19 @@ class WeightedBinaryTree(object):
         else:
             return False
 
-    # TODO: return a RebalanceResult
+    # TODO: Maybe rename this to make it more descriptive, since the WeightedBinaryTree does not rebalance the way
+    # other trees do.  This pushes nodes up to the top when necessary so "rebalance" may not be the best name.
+    def rebalance(self):
+        while self.should_rebalance():
+            self.rebalance_one_level()
+
+    def should_rebalance(self):
+        return self.parent is not None and self.weight > self.get_rebalance_threshold_weight()
+
+    def get_rebalance_threshold_weight(self):
+        return self.parent.weight * self.REBALACE_COEFFICIENT
+
+    # TODO: Does it need to return a RebalanceResult?
     def rebalance_one_level(self):
         """
         Moves the current node up or down, and shifts parent, left and right, and parent's left or right, accordingly.
